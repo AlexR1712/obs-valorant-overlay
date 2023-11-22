@@ -21,6 +21,11 @@
         </div>
       </div>
     </div>
+  <footer class="footer footer-center p-4 bg-base-300 text-base-content">
+  <aside>
+    <p>Copyright © {{ new Date().getFullYear() }} - Created with ❤️ by @SoyAlexity</p>
+  </aside>
+</footer>
 </template>
 
 <script setup lang="ts">
