@@ -44,14 +44,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import ValorantClient from '../services/ValorantClient.ts'
 
-const router = useRouter()
 const route = useRoute()
 
 const loaded = ref(false);
-const profileSummary = ref({})
+const profileSummary:any = ref({})
 
 function summarizedMatches(matchesList:any) {
   const competitiveMatches = matchesList.reduce((acc:any, match:any) => {

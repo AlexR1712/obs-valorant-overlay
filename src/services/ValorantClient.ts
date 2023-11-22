@@ -7,7 +7,7 @@ class ValorantClient {
     constructor() {
     }
   
-    public async getUUID(playerName: string, tag: string) {
+    public async getUUID(playerName: any, tag: any) {
 
       const url = `${this.baseUrl}/v1/account/${playerName}/${tag}`;
       const response = await axios.get(url);
