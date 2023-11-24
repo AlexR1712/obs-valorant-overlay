@@ -1,8 +1,7 @@
 <template>
-<div class="stats bg-no-repeat bg-cover" v-if="loaded"
-:class="`bg-[linear-gradient(to_right_bottom,rgba(0,0,0,0.98),rgba(36,36,36,0.85)),url('${profileSummary.card.wide}')]`">
+<div class="stats glass" v-if="loaded"
+:class="`bg-[url('${profileSummary.card.wide}')]`">
   <div class="stat" :class="{ skeleton: !loaded }" >
-<!--     <figure><img src="https://media.valorant-api.com/playercards/43b78d51-47c7-ac2e-2939-92858e2bf7db/smallart.png" alt="Shoes" /></figure> -->
     <div class="stat-figure text-secondary">
       <div class="avatar">
         <div class="w-16 rounded-full">
@@ -31,14 +30,18 @@
     <div class="stat-value">ELO {{ profileSummary.rank.elo }}</div>
     <div class="stat-desc text-xl">{{profileSummary.stats.winrate.toFixed(2)}}% Win Rate</div>
     <!-- <div class="stat-desc">21% Win Rate</div> -->
-  </div>
-  
-
+    <div class="avatar-group -space-x-2.5 rtl:space-x-reverse">
+      <template v-for="i in 5" :key="i">
+        <div class="avatar border-2 bg-base-100" :class="{ 'border-success': isWonGame(competitiveMatches[i]), 'border-error': ! isWonGame(competitiveMatches[i]) }">
+          <div class="w-6">
+            <img :src="getCharacterIcon(competitiveMatches[i].stats.character.id)" />
+          </div>
+        </div>        
+      </template>
+    </div>
+  </div>  
   
 </div>
-
-
-
 
 </template>
 
@@ -51,6 +54,28 @@ const route = useRoute()
 
 const loaded = ref(false);
 const profileSummary:any = ref({})
+const competitiveMatches = ref([])
+
+
+function getMatches(type:string) {
+  return profileSummary.value.matches.filter((match:any) => {
+    return match.meta.mode === type;
+  })
+}
+
+function getCharacterIcon(characterId:string) {
+  return `https://titles.trackercdn.com/valorant-api/agents/${characterId}/displayicon.png`
+}
+
+function isWonGame(match:any) {
+  let result = false
+  if (match.stats.team === 'Blue' && match.teams.blue > match.teams.red) {
+    result = true
+  } else if (match.stats.team === 'Red' && match.teams.red > match.teams.blue) {
+    result = true
+  }
+  return result
+}
 
 function summarizedMatches(matchesList:any) {
   const competitiveMatches = matchesList.reduce((acc:any, match:any) => {
@@ -133,6 +158,8 @@ onMounted(async () => {
         matches: matchesData,
         stats: summarizedMatches(matchesData)
       }
+
+      competitiveMatches.value = getMatches("Competitive")
 
       loaded.value = true
 
