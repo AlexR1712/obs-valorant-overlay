@@ -49,15 +49,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import ValorantClient from '@/services/ValorantClient.ts'
-import { useOverlayStore } from '@/stores/OverlayStore.ts'
+import ValorantClient from '../services/ValorantClient.ts'
+import { useOverlayStore } from '../stores/OverlayStore.ts'
 
 const store = useOverlayStore()
 const route = useRoute()
 
 const loaded = ref(false);
-const profileSummary:any = ref({})
-const competitiveMatches = ref([])
 
 
 function getCharacterIcon(characterId:string) {
