@@ -1,19 +1,20 @@
 <template>
 <div class="stats glass" v-if="loaded"
-:class="`bg-[url('${profileSummary.card.wide}')]`">
+:class="`bg-[url('${store.profile.card.wide}')]`">
   <div class="stat" :class="{ skeleton: !loaded }" >
     <div class="stat-figure text-secondary">
       <div class="avatar">
         <div class="w-16 rounded-full">
-          <img :src="profileSummary.rank.image" />
+          <img :src="store.tier.images.small" />
         </div>
       </div>
     </div>
     <div class="stat-title">Rating</div>
-    <div class="stat-value">{{ profileSummary.rank.tier }}</div>
-    <div class="stat-title">{{ profileSummary.rank.ranking_tier }} RR</div>
-    <div class="stat-value">Level {{ profileSummary.level }}</div>
-    <div class="stat-desc text-xl">{{ profileSummary.name }}#{{ profileSummary.tag }}</div>
+    <div class="stat-value">{{ store.tier.rank }}</div>
+    <div class="stat-title">{{ store.tier.ranking_in_tier }} RR</div>
+    <div class="stat-value">Level {{ store.profile.account_level }}</div>
+    <div class="stat-desc text-xl">{{ store.profile.name }}#{{ store.profile.tag }}</div><!-- 
+    <div class="stat-desc text-xl">Last Update: {{ store.profile.last_update }}</div> -->
   </div>
 
   <div class="stat">
@@ -25,16 +26,16 @@
 
     </div>
     <div class="stat-title">Stats</div>
-    <div class="stat-value">K/D {{ profileSummary.stats.kd.toFixed(2) }}</div>
-    <div class="stat-value">ACS {{ profileSummary.stats.acs.toFixed(2) }}</div>
-    <div class="stat-value">ELO {{ profileSummary.rank.elo }}</div>
-    <div class="stat-desc text-xl">{{profileSummary.stats.winrate.toFixed(2)}}% Win Rate</div>
+    <div class="stat-value">K/D {{ store.stats.kd.toFixed(2) }}</div>
+    <div class="stat-value">ACS {{ store.stats.acs.toFixed(2) }}</div>
+    <div class="stat-value">ELO {{ store.tier.elo }}</div>
+    <div class="stat-desc text-xl">{{store.stats.winrate.toFixed(2)}}% Win Rate</div>
     <!-- <div class="stat-desc">21% Win Rate</div> -->
     <div class="avatar-group -space-x-2.5 rtl:space-x-reverse">
       <template v-for="i in 5" :key="i">
-        <div class="avatar border-2 bg-base-100" :class="{ 'border-success': isWonGame(competitiveMatches[i]), 'border-error': ! isWonGame(competitiveMatches[i]) }">
+        <div class="avatar border-2 bg-base-100" :class="{ 'border-success': isWonGame(store.competitiveMatches[i]), 'border-error': ! isWonGame(store.competitiveMatches[i]) }">
           <div class="w-6">
-            <img :src="getCharacterIcon(competitiveMatches[i].stats.character.id)" />
+            <img :src="getCharacterIcon(store.competitiveMatches[i].stats.character.id)" />
           </div>
         </div>        
       </template>
@@ -48,20 +49,16 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import ValorantClient from '../services/ValorantClient.ts'
+import ValorantClient from '@/services/ValorantClient.ts'
+import { useOverlayStore } from '@/stores/OverlayStore.ts'
 
+const store = useOverlayStore()
 const route = useRoute()
 
 const loaded = ref(false);
 const profileSummary:any = ref({})
 const competitiveMatches = ref([])
 
-
-function getMatches(type:string) {
-  return profileSummary.value.matches.filter((match:any) => {
-    return match.meta.mode === type;
-  })
-}
 
 function getCharacterIcon(characterId:string) {
   return `https://titles.trackercdn.com/valorant-api/agents/${characterId}/displayicon.png`
@@ -77,94 +74,37 @@ function isWonGame(match:any) {
   return result
 }
 
-function summarizedMatches(matchesList:any) {
-  const competitiveMatches = matchesList.reduce((acc:any, match:any) => {
-    if (match.meta.mode === "Competitive") {
-      acc.matchesAmount += 1;
-      acc.kills += match.stats.kills;
-      acc.deaths += match.stats.deaths;
-      acc.assists += match.stats.assists;
-      acc.acs += match.stats.score / (match.teams.blue + match.teams.red); // AVERAGE COMBAT SCORE
-      acc.adr += match.stats.damage.made / (match.teams.blue + match.teams.red);
-
-      // determine win or lost
-      if (match.stats.team === 'Blue' && match.teams.blue > match.teams.red) {
-        acc.win += 1;
-      } else if (match.stats.team === 'Red' && match.teams.red > match.teams.blue) {
-        acc.win += 1;
-      } else {
-        acc.lost += 1;
-      }
-    }
-    return acc;
-  }, {
-    matchesAmount: 0,
-    kills: 0,
-    deaths: 0,
-    assists: 0,
-    acs: 0,
-    adr: 0,
-    win: 0,
-    lost: 0,
-  });
-
-  console.log(competitiveMatches)
-
-  const { matchesAmount, kills, deaths, assists, acs, adr } = competitiveMatches;
-  const kd = kills / deaths;
-  const kda = (kills + assists) / deaths;
-  const AverageCombatScore = acs / matchesAmount
-  const AverageDamageRound = adr / matchesAmount
-  const winrate = (competitiveMatches.win / competitiveMatches.matchesAmount) * 100;
+async function init() {
+  const profileRequest = await ValorantClient.getUUID(route.query.name, route.query.tag);
+  const mmrRequest = await ValorantClient.getMMRHistory(profileRequest.data.puuid, profileRequest.data.region);
+  const matchesRequest = await ValorantClient.getMatchesHistory(profileRequest.data.puuid, profileRequest.data.region);
 
   return {
-    kills,
-    deaths,
-    assists,
-    kd,
-    kda,
-    acs: AverageCombatScore,
-    adr: AverageDamageRound,
-    competitiveMatchesAmount: matchesAmount,
-    winrate: winrate,
-  };
+    profile: profileRequest.data,
+    mmr: mmrRequest.data,
+    matches: matchesRequest.data
+  }
+}
+
+async function refresh(patch = false) {
+  let data = await init()
+  if (patch) {    
+    store.$patch(data)
+  } else {
+    store.$state = data
+  }  
 }
 
 onMounted(async () => {
-      const profileRequest = await ValorantClient.getUUID(route.query.name, route.query.tag);
-      const profile = profileRequest.data
+      // set default state
+      let minutesToUpdate = 25;
+      await refresh()
 
-      const mmrRequest = await ValorantClient.getMMRHistory(profile.puuid, profile.region);
-      const mmrData = mmrRequest.data
-
-      const matchesRequest = await ValorantClient.getMatchesHistory(profile.puuid, profile.region);
-      const matchesData = matchesRequest.data
-
-      //console.log(overlayData)
-      let lastMatchInfo = mmrData[0];
-
-      profileSummary.value = {
-        name: profile.name,
-        tag: profile.tag,
-        level: profile.account_level,
-        card: profile.card,
-        rank: {
-          tier: lastMatchInfo.currenttierpatched,
-          ranking_tier: lastMatchInfo.ranking_in_tier,
-          image: lastMatchInfo.images.small,
-          elo: lastMatchInfo.elo
-        },
-        mmrHistory: mmrData,
-        matches: matchesData,
-        stats: summarizedMatches(matchesData)
-      }
-
-      competitiveMatches.value = getMatches("Competitive")
+      setInterval(async () => {
+        await refresh(true)
+      }, minutesToUpdate * 60 * 1000)
 
       loaded.value = true
-
-      console.log(profileSummary.value)
-
 });
 
 </script>
