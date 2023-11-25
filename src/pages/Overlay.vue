@@ -10,9 +10,9 @@
       </div>
     </div>
     <div class="stat-title">Rating</div>
-    <div class="stat-value">{{ store.tier.rank }}</div>
-    <div class="stat-title">{{ store.tier.ranking_in_tier }} RR</div>
-    <div class="stat-value">Level {{ store.profile.account_level }}</div>
+    <div class="stat-value text-white">{{ store.tier.rank }}</div>
+    <div class="stat-title text-white">{{ store.tier.ranking_in_tier }} RR</div>
+    <div class="stat-value text-white">Level {{ store.profile.account_level }}</div>
     <div class="stat-desc text-xl">{{ store.profile.name }}#{{ store.profile.tag }}</div><!-- 
     <div class="stat-desc text-xl">Last Update: {{ store.profile.last_update }}</div> -->
   </div>
@@ -26,9 +26,9 @@
 
     </div>
     <div class="stat-title">Stats</div>
-    <div class="stat-value">K/D {{ store.stats.kd.toFixed(2) }}</div>
-    <div class="stat-value">ACS {{ store.stats.acs.toFixed(2) }}</div>
-    <div class="stat-value">ELO {{ store.tier.elo }}</div>
+    <div class="stat-value text-white">K/D {{ store.stats.kd.toFixed(2) }}</div>
+    <div class="stat-value text-white">ACS {{ store.stats.acs.toFixed(2) }}</div>
+    <div class="stat-value text-white">ELO {{ store.tier.elo }}</div>
     <div class="stat-desc text-xl">{{store.stats.winrate.toFixed(2)}}% Win Rate</div>
     <!-- <div class="stat-desc">21% Win Rate</div> -->
     <div class="avatar-group -space-x-2.5 rtl:space-x-reverse">

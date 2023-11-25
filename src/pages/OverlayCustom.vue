@@ -26,9 +26,9 @@
 
     </div>
     <div class="stat-title text-white">Stats</div>
-    <div class="stat-value">K/D {{ store.stats.kd.toFixed(2) }}</div>
-    <div class="stat-value">ACS {{ store.stats.acs.toFixed(2) }}</div>
-    <div class="stat-value">ELO {{ store.tier.elo }}</div>
+    <div class="stat-value text-white">K/D {{ store.stats.kd.toFixed(2) }}</div>
+    <div class="stat-value text-white">ACS {{ store.stats.acs.toFixed(2) }}</div>
+    <div class="stat-value text-white">ELO {{ store.tier.elo }}</div>
     <div class="stat-desc text-xl">{{store.stats.winrate.toFixed(2)}}% Win Rate</div>
     <!-- <div class="stat-desc">21% Win Rate</div> -->
     <div class="avatar-group -space-x-2.5 rtl:space-x-reverse">
