@@ -16,7 +16,7 @@ const routes = [
     },
     {
         path: '/overlay/valorant/custom',
-        name: 'Overlay',
+        name: 'Overlay 2',
         component: OverlayCustom
     }
 ]
