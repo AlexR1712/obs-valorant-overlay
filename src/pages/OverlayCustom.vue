@@ -1,5 +1,5 @@
 <template>
-<div class="stats glass bg-gradient-to-br from-violet-700 to-grey-500" v-if="loaded"
+<div class="stats glass rounded-3xl bg-gradient-to-br from-violet-700 to-grey-500" v-if="loaded"
 :class="`bg-[url('${store.profile.card.wide}')]`">
   <div class="stat" :class="{ skeleton: !loaded }" >
     <div class="stat-figure text-secondary">
